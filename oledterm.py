@@ -14,8 +14,8 @@ from luma.core.virtual import terminal
 from PIL import ImageFont
 
 VIRTUAL_TERMINAL_DEVICE = "/dev/vcsa"
-ROWS = 9
-COLS = 31
+ROWS = 10
+COLS = 60
 
 # based on demo_opts.py
 from luma.core import cmdline, error
@@ -52,10 +52,10 @@ def make_font(name, size):
 
 def main():
     if not os.access(VIRTUAL_TERMINAL_DEVICE, os.R_OK):
-       print "Unable to access %s, try running as root?" % (VIRTUAL_TERMINAL_DEVICE,)
+       print(("Unable to access %s, try running as root?" % (VIRTUAL_TERMINAL_DEVICE,)))
        raise SystemExit
 
-    fontname = "tiny.ttf"
+    fontname = "TomThumb4x6.ttf"
     size = 6
 
     font = make_font(fontname, size) if fontname else None
@@ -72,7 +72,6 @@ def main():
         #data = file(VIRTUAL_TERMINAL_DEVICE).read()
         data = subprocess.check_output(["screendump"])
 	#print [data]
-
         # Clear, but don't flush to avoid flashing
         #term.clear()
         term._cx, term._cy = (0, 0)
@@ -83,21 +82,21 @@ def main():
         #term.puts(data)
 
         for char in data:
-            if char == '\r':
+            if '\r' in chr(char):
                 term.carriage_return()
-            elif char == '\n':
+            elif chr(10) in chr(char):
                 #term.newline()
                 # no scroll, no flush
                 term.carriage_return()
                 x = 0
                 term._cy += term._ch
-            elif char == '\b':
+            elif '\b' in chr(char):
                 term.backspace()
                 x =- 1
-            elif char == '\t':
+            elif '\t' in chr(char):
                 term.tab()
             else:
-                term.putch(char)
+                term.putch(chr(char))
 
         term.flush()
         time.sleep(0.01)
